@@ -60,59 +60,75 @@ const OnboardingForm = () => {
         fetchSkillsAndCertifications();
     }, []);
 
+    useEffect(() => {
+      // Assuming the email was saved in localStorage when sending the magic link
+      const savedEmail = localStorage.getItem('magicLinkEmail');
+      if (savedEmail) {
+        setEmail(savedEmail);
+      }
+    }, []);
+    
+
     const handleNext = async (event) => {
-        event.preventDefault();
-
-        if (step === 1) {
-            setStep(2);
-        } else if (step === 2) {
-            const formData = new FormData();
-            formData.append('first_name', firstName);
-            formData.append('last_name', lastName);
-            formData.append('phone_no', phoneNo);
-            formData.append('address_line1', addressLine1);
-            formData.append('address_line2', addressLine2);
-            formData.append('city', city);
-            formData.append('state', state);
-            formData.append('country', country);
-            formData.append('postal_code', postalCode);
-            formData.append('linkedin_url', linkedinUrl);
-            formData.append('username', username);
-            formData.append('password', password);
-            formData.append('email', email);
-            formData.append('recent_job', recentJob);
-            formData.append('preferred_roles', preferredRoles);
-            formData.append('availability', availability);
-            formData.append('work_permit_status', workPermitStatus);
-            formData.append('preferred_role_type', preferredRoleType);
-            formData.append('preferred_work_arrangement', preferredWorkArrangement);
-            formData.append('preferred_compensation_range', preferredCompensationRange);
-            formData.append('resume', resume);
-
-            // Append selected skills and certifications
-            selectedSkills.forEach(skill => formData.append('skills[]', skill));
-            selectedCertifications.forEach(cert => formData.append('certifications[]', cert));
-
-            // Add new skills and certifications
-            if (newSkill) {
-                formData.append('skills[]', newSkill);
-                setNewSkill(''); // Clear the input after submission
-            }
-
-            if (newCertification) {
+      event.preventDefault();
+  
+      if (step === 1) {
+          setStep(2);
+      } else if (step === 2) {
+          const formData = new FormData();
+          formData.append('first_name', firstName);
+          formData.append('last_name', lastName);
+          formData.append('phone_no', phoneNo);
+          formData.append('address_line1', addressLine1);
+          formData.append('address_line2', addressLine2);
+          formData.append('city', city);
+          formData.append('state', state);
+          formData.append('country', country);
+          formData.append('postal_code', postalCode);
+          formData.append('linkedin_url', linkedinUrl);
+          formData.append('username', username);
+          formData.append('password', password);
+          formData.append('email', email);
+          formData.append('recent_job', recentJob);
+          formData.append('preferred_roles', preferredRoles);
+          formData.append('availability', availability);
+          formData.append('work_permit_status', workPermitStatus);
+          formData.append('preferred_role_type', preferredRoleType);
+          formData.append('preferred_work_arrangement', preferredWorkArrangement);
+          formData.append('preferred_compensation_range', preferredCompensationRange);
+          formData.append('resume_path', resume);
+  
+          // Append selected skills and certifications
+          selectedSkills.forEach(skill => formData.append('skills[]', skill));
+          selectedCertifications.forEach(cert => formData.append('certifications[]', cert));
+  
+          // Add new skills and certifications if provided
+          if (newSkill) {
+              formData.append('skills[]', newSkill);
+              setNewSkill(''); // Clear the input after submission
+          }
+  
+          if (newCertification) {
               formData.append('certifications[]', newCertification);
               setNewCertification(''); // Clear the input after submission
           }
-
+  
           try {
-              await axios.post('https://5q5faxzgb7.execute-api.ap-south-1.amazonaws.com/api/submit-candidate', formData, {
+              // Post request with the form data
+              const response = await axios.post('https://5q5faxzgb7.execute-api.ap-south-1.amazonaws.com/api/submit-candidate', formData, {
                   headers: {
                       'Content-Type': 'multipart/form-data',
                   },
               });
-              navigate('/success'); // Redirect to a success page after submission
+              
+              if (response.status === 200) {
+                  // Redirect to success page
+                  navigate('/success');
+              }
           } catch (error) {
+              // Improved error handling
               console.error('Error submitting the form:', error);
+              alert('An error occurred while submitting the form. Please try again later.');
           }
       }
   };
@@ -338,20 +354,21 @@ const OnboardingForm = () => {
               </div>
             </div>
   
-            <div className="grid grid-cols-1 gap-4">
-              {/* Email */}
-              <div>
-                <label htmlFor="email" className="block text-gray-700 text-sm font-medium mb-2">Email</label>
-                <input
-                  type="email"
-                  id="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full p-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-200 focus:outline-none transition-all ease-in-out duration-200 shadow-md placeholder:text-sm placeholder:text-gray-400"
-                  required
-                />
-              </div>
-            </div>
+           <div className="grid grid-cols-1 gap-4">
+                                {/* Email */}
+                                <div>
+                                    <label htmlFor="email" className="block text-gray-700 text-sm font-medium mb-2">Email</label>
+                                    <input
+                                        type="email"
+                                        id="email"
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        className="w-full p-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-200 focus:outline-none transition-all ease-in-out duration-200 shadow-md placeholder:text-sm placeholder:text-gray-400"
+                                        required
+                                    />
+                                </div>
+                            </div>
+
           </>
         )}
   
@@ -381,48 +398,99 @@ const OnboardingForm = () => {
     </div>
 
     {/* Availability */}
-    <div className="w-full px-2 mb-4">
-      <label className="block text-gray-700 text-sm font-bold mb-2">Availability</label>
-      <input
-        type="text"
-        value={availability}
-        onChange={(e) => setAvailability(e.target.value)}
-        className="w-full p-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-200 focus:outline-none transition-all ease-in-out duration-200 shadow-md placeholder:text-sm placeholder:text-gray-400"
-      />
+<div className="w-full px-2 mb-4">
+  <label className="block text-gray-700 text-sm font-bold mb-2">Availability</label>
+  <div className="relative">
+    <select
+      value={availability}
+      onChange={(e) => setAvailability(e.target.value)}
+      className="w-full p-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-200 focus:outline-none transition-all ease-in-out duration-200 shadow-md placeholder:text-sm placeholder:text-gray-400 appearance-none"
+    >
+      <option value="" disabled>Select availability</option>
+      <option value="immediate">Immediate</option>
+      <option value="less_than_3_months">Less than 3 months</option>
+      <option value="more_than_3_months">More than 3 months</option>
+    </select>
+    <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+      <svg
+        className="w-5 h-5 text-gray-400"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+      </svg>
     </div>
+  </div>
+</div>
 
-    {/* Work Permit Status */}
-    <div className="w-full px-2 mb-4">
-      <label className="block text-gray-700 text-sm font-bold mb-2">Work Permit Status</label>
-      <input
-        type="text"
-        value={workPermitStatus}
-        onChange={(e) => setWorkPermitStatus(e.target.value)}
-        className="w-full p-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-200 focus:outline-none transition-all ease-in-out duration-200 shadow-md placeholder:text-sm placeholder:text-gray-400"
-      />
-    </div>
+{/* Work Permit Status */}
+<div className="w-full px-2 mb-4">
+  <label className="block text-gray-700 text-sm font-bold mb-2">Work Permit Status</label>
+  <input
+    type="text"
+    value={workPermitStatus}
+    onChange={(e) => setWorkPermitStatus(e.target.value)}
+    className="w-full p-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-200 focus:outline-none transition-all ease-in-out duration-200 shadow-md placeholder:text-sm placeholder:text-gray-400"
+  />
+</div>
 
-    {/* Preferred Role Type */}
-    <div className="w-full px-2 mb-4">
-      <label className="block text-gray-700 text-sm font-bold mb-2">Preferred Role Type</label>
-      <input
-        type="text"
-        value={preferredRoleType}
-        onChange={(e) => setPreferredRoleType(e.target.value)}
-        className="w-full p-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-200 focus:outline-none transition-all ease-in-out duration-200 shadow-md placeholder:text-sm placeholder:text-gray-400"
-      />
+{/* Preferred Role Type */}
+<div className="w-full px-2 mb-4">
+  <label className="block text-gray-700 text-sm font-bold mb-2">Preferred Role Type</label>
+  <div className="relative">
+    <select
+      value={preferredRoleType}
+      onChange={(e) => setPreferredRoleType(e.target.value)}
+      className="w-full p-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-200 focus:outline-none transition-all ease-in-out duration-200 shadow-md placeholder:text-sm placeholder:text-gray-400 appearance-none"
+    >
+      <option value="" disabled>Select role type</option>
+      <option value="full_time">Full Time</option>
+      <option value="part_time">Part Time</option>
+      <option value="intern">Intern</option>
+    </select>
+    <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+      <svg
+        className="w-5 h-5 text-gray-400"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+      </svg>
     </div>
+  </div>
+</div>
 
-    {/* Preferred Work Arrangement */}
-    <div className="w-full px-2 mb-4">
-      <label className="block text-gray-700 text-sm font-bold mb-2">Preferred Work Arrangement</label>
-      <input
-        type="text"
-        value={preferredWorkArrangement}
-        onChange={(e) => setPreferredWorkArrangement(e.target.value)}
-        className="w-full p-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-200 focus:outline-none transition-all ease-in-out duration-200 shadow-md placeholder:text-sm placeholder:text-gray-400"
-      />
+{/* Preferred Work Arrangement */}
+<div className="w-full px-2 mb-4">
+  <label className="block text-gray-700 text-sm font-bold mb-2">Preferred Work Arrangement</label>
+  <div className="relative">
+    <select
+      value={preferredWorkArrangement}
+      onChange={(e) => setPreferredWorkArrangement(e.target.value)}
+      className="w-full p-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-200 focus:outline-none transition-all ease-in-out duration-200 shadow-md placeholder:text-sm placeholder:text-gray-400 appearance-none"
+    >
+      <option value="" disabled>Select work arrangement</option>
+      <option value="hybrid">Hybrid</option>
+      <option value="work_from_home">Work From Home</option>
+      <option value="remote">Remote</option>
+    </select>
+    <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+      <svg
+        className="w-5 h-5 text-gray-400"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+      </svg>
     </div>
+  </div>
+</div>
 
     {/* Preferred Compensation Range */}
     <div className="w-full px-2 mb-4">
