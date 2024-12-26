@@ -15,7 +15,7 @@ function Login() {
     e.preventDefault();
     setError('');
     try {
-      const response = await axios.post('http://localhost:3000/api/login', { email, password });
+      const response = await axios.post('https://5q5faxzgb7.execute-api.ap-south-1.amazonaws.com/api/login', { email, password });
       const user = response.data;
       if (response.status === 200) {
         const userData = response.data.user;
