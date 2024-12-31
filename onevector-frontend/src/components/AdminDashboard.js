@@ -41,7 +41,7 @@ const { isDarkMode, toggleTheme } = useTheme();
 
 const handleDownloadDetails = async () => {
   try {
-    const response = await axios.get('https://5q5faxzgb7.execute-api.ap-south-1.amazonaws.com/api/candidates'); // Fetch candidates
+    const response = await axios.get(' https://5q5faxzgb7.execute-api.ap-south-1.amazonaws.com/api/candidates'); // Fetch candidates
 
     if (response.data.length === 0) {
       alert('No candidate details available to download.');
@@ -51,7 +51,7 @@ const handleDownloadDetails = async () => {
     // Create an array to hold all candidate details
     const candidatesWithDetails = await Promise.all(response.data.map(async (candidate) => {
       // Fetch personal details for each candidate
-      const personalDetailsResponse = await axios.get(`https://5q5faxzgb7.execute-api.ap-south-1.amazonaws.com/api/personalDetails/${candidate.id}`);
+      const personalDetailsResponse = await axios.get(` https://5q5faxzgb7.execute-api.ap-south-1.amazonaws.com/api/personalDetails/${candidate.id}`);
       const personalDetails = personalDetailsResponse.data;
 
       // Combine candidate and personal details
@@ -102,7 +102,7 @@ const handleDownloadDetails = async () => {
       setLoading(true);
       setError('');
       try {
-        const response = await axios.get('https://5q5faxzgb7.execute-api.ap-south-1.amazonaws.com/api/candidates');
+        const response = await axios.get(' https://5q5faxzgb7.execute-api.ap-south-1.amazonaws.com/api/candidates');
         const filteredCandidates = response.data
           .filter((candidate) => candidate.role !== 'admin')
           .sort((a, b) => (a.role === 'power_user' ? -1 : 1));
@@ -119,7 +119,7 @@ const handleDownloadDetails = async () => {
 
   const fetchMagicLinks = async () => {
     try {
-        const response = await axios.get('https://5q5faxzgb7.execute-api.ap-south-1.amazonaws.com/api/magic-links');
+        const response = await axios.get(' https://5q5faxzgb7.execute-api.ap-south-1.amazonaws.com/api/magic-links');
         setMagicLinks(response.data);
         setShowHistoryPopup(true);
     } catch (error) {
@@ -132,7 +132,7 @@ const handleDownloadDetails = async () => {
     if (window.confirm('Are you sure you want to delete this candidate and all their associated data?')) {
       try {
         console.log(`Attempting to delete candidate with ID: ${id}`);
-        const response = await axios.delete(`https://5q5faxzgb7.execute-api.ap-south-1.amazonaws.com/api/candidates/${id}`);
+        const response = await axios.delete(` https://5q5faxzgb7.execute-api.ap-south-1.amazonaws.com/api/candidates/${id}`);
         console.log('Delete response:', response);
         
         // Update candidates list after successful deletion
@@ -162,7 +162,7 @@ const handleDownloadDetails = async () => {
   
     try {
       // Send magic link to the email
-      await axios.post('https://5q5faxzgb7.execute-api.ap-south-1.amazonaws.com/api/send-magic-link', { email });
+      await axios.post(' https://5q5faxzgb7.execute-api.ap-south-1.amazonaws.com/api/send-magic-link', { email });
   
       // Save email to localStorage after sending the magic link
       localStorage.setItem('magicLinkEmail', email);
@@ -214,7 +214,7 @@ const handleDownloadDetails = async () => {
     if (!selectedCandidate) return;
 
     try {
-      await axios.put(`https://5q5faxzgb7.execute-api.ap-south-1.amazonaws.com/api/candidates/${selectedCandidate.id}/role`, { role: newRole });
+      await axios.put(` https://5q5faxzgb7.execute-api.ap-south-1.amazonaws.com/api/candidates/${selectedCandidate.id}/role`, { role: newRole });
 
       const updatedCandidates = candidates.map((candidate) =>
         candidate.id === selectedCandidate.id ? { ...candidate, role: newRole } : candidate
@@ -238,15 +238,15 @@ const handleDownloadDetails = async () => {
 
     try {
       // First delete the qualifications
-      await axios.delete(`https://5q5faxzgb7.execute-api.ap-south-1.amazonaws.com/api/qualifications/${selectedCandidate.id}`);
+      await axios.delete(` https://5q5faxzgb7.execute-api.ap-south-1.amazonaws.com/api/qualifications/${selectedCandidate.id}`);
       // Then delete the user skills
-      await axios.delete(`https://5q5faxzgb7.execute-api.ap-south-1.amazonaws.com/api/user_skills/${selectedCandidate.id}`);
+      await axios.delete(` https://5q5faxzgb7.execute-api.ap-south-1.amazonaws.com/api/user_skills/${selectedCandidate.id}`);
       // Then delete the user certifications
-      await axios.delete(`https://5q5faxzgb7.execute-api.ap-south-1.amazonaws.com/api/user_certifications/${selectedCandidate.id}`);
+      await axios.delete(` https://5q5faxzgb7.execute-api.ap-south-1.amazonaws.com/api/user_certifications/${selectedCandidate.id}`);
       // Then delete the personal details
-      await axios.delete(`https://5q5faxzgb7.execute-api.ap-south-1.amazonaws.com/api/personaldetails/${selectedCandidate.id}`);
+      await axios.delete(` https://5q5faxzgb7.execute-api.ap-south-1.amazonaws.com/api/personaldetails/${selectedCandidate.id}`);
       // Finally delete the user
-      await axios.delete(`https://5q5faxzgb7.execute-api.ap-south-1.amazonaws.com/api/candidates/${selectedCandidate.id}`);
+      await axios.delete(` https://5q5faxzgb7.execute-api.ap-south-1.amazonaws.com/api/candidates/${selectedCandidate.id}`);
       
       setCandidates(candidates.filter((candidate) => candidate.id !== selectedCandidate.id));
       setSuccessMessageText('Candidate deleted successfully!');
